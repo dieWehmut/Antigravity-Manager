@@ -22,22 +22,30 @@ same file and base URL `http://localhost:8045/v1`. Do not expose port 8045 to
 the LAN; this setup intentionally binds only to loopback.
 
 The WSL process cannot scan Windows Antigravity's local account database as a
-native Windows process would. The browser version of the manager offers OAuth
-sign-in; its **Custom DB** file picker is desktop-only. To reuse an existing
-Windows login, make the Windows drive available in WSL and submit the Windows
-IDE database path to the import API (close Antigravity before copying or
-importing its database):
+native Windows process would. Once `/mnt/c` is available, import the Windows
+login by passing the Windows profile directory name:
 
 ```bash
-WEB_PASSWORD=$(sed -n 's/^WEB_PASSWORD=//p' "$HOME/.config/antigravity-tools/manager.env")
-curl --fail --request POST http://localhost:8045/api/accounts/import/db-custom \
-  --header "x-api-key: $WEB_PASSWORD" --header 'Content-Type: application/json' \
-  --data '{"path":"/mnt/c/Users/<Windows-user>/AppData/Roaming/Antigravity IDE/User/globalStorage/state.vscdb"}'
+./deploy/wsl/import-windows-account.sh <Windows-user>
 ```
 
-Replace `<Windows-user>` with the Windows account directory name. The import
-reads the database and exchanges its refresh token with Google. If the Windows
-drive is unavailable, add the account through the manager's OAuth flow.
+The helper checks the Antigravity IDE and Classic profile locations, then asks
+the manager to read the database and exchange its refresh token with Google.
+
+If `/mnt/c` is unavailable, close Antigravity and use Windows File Explorer to
+copy your `state.vscdb` (from `%APPDATA%\Antigravity IDE\User\globalStorage` or
+the corresponding `Antigravity` folder) to
+`\\wsl.localhost\<distro>\home\<Linux-user>\.local\share\antigravity-tools`.
+Then import the copy from WSL:
+
+```bash
+./deploy/wsl/import-windows-account.sh --db "$HOME/.local/share/antigravity-tools/state.vscdb"
+```
+
+The backup can contain login credentials. Keep it in the private data directory,
+and remove the copy after a successful import. If the installed Antigravity
+version does not store an importable login in this database, use **Accounts →
+Add Account → OAuth** in the management UI to authorize the same Google account.
 
 Service commands:
 
