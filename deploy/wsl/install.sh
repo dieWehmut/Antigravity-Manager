@@ -13,7 +13,7 @@ app_deb=${1:-}
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
-for command in curl sha256sum dpkg-deb apt-get npm openssl systemctl; do
+for command in curl sha256sum dpkg-deb apt-get npm openssl systemctl python3; do
     command -v "$command" >/dev/null || { echo "Missing required command: $command" >&2; exit 1; }
 done
 
