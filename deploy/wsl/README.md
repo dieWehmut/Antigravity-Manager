@@ -31,8 +31,21 @@ login by passing the Windows profile directory name:
 
 The helper checks the Antigravity IDE and Classic profile locations, then asks
 the manager to read the database and exchange its refresh token with Google.
-The browser version also provides an OAuth sign-in flow if you prefer to log in
-again.
+
+If `/mnt/c` is unavailable, close Antigravity and use Windows File Explorer to
+copy your `state.vscdb` (from `%APPDATA%\Antigravity IDE\User\globalStorage` or
+the corresponding `Antigravity` folder) to
+`\\wsl.localhost\<distro>\home\<Linux-user>\.local\share\antigravity-tools`.
+Then import the copy from WSL:
+
+```bash
+./deploy/wsl/import-windows-account.sh --db "$HOME/.local/share/antigravity-tools/state.vscdb"
+```
+
+The backup can contain login credentials. Keep it in the private data directory,
+and remove the copy after a successful import. If the installed Antigravity
+version does not store an importable login in this database, use **Accounts →
+Add Account → OAuth** in the management UI to authorize the same Google account.
 
 Service commands:
 
