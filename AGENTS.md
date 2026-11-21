@@ -68,4 +68,8 @@
   - Order side effects to fail before the point of no return: write credentials before killing a process, validate before deleting.
   - Detect broadly, act narrowly: a matcher may recognize a whole class of problems, while its effect stays inside the intended data — not across line breaks, tags, or other clauses. Bound every wait with a timeout.
 
+- **Rate-Limit Continuation**:
+  - When a process or service returns a confirmed HTTP 429, keep the active task and checkpoint intact. Honor `Retry-After`; if it is absent, use exponential backoff with jitter from 30 seconds up to 15 minutes per wait.
+  - Continue the same task after each bounded wait, without parallel duplicate retries. Use `/goal resume` only when the current interface supports it and the goal is actually paused; do not send an empty message as a simulated resume.
+
 Maintained by @jeikl
